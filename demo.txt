@@ -1,0 +1,24 @@
+{
+  "companyName": "Blockchain Solutions Pvt Ltd",
+  "firstName": "Alice",
+  "lastName": "Johnson",
+  "email": "alice@gmail.com",
+  "logo": "http://localhost:3000/uploads/logos/abc.png",
+  "password": "securePass123",
+  "gstNumber": "27AAECS1234F1Z5",
+  "categoryID": 2,
+  "legalRepresentative": "0x8dDf7814F14035aa34e867E6BB040CfDA1D3B4Ac",
+  "addressline1": "1234 Sector 5",
+  "addressline2": "Tech Park Road",
+  "district": "Bangalore",
+  "stateID": 29
+}
+
+
+
+
+// access token
+
+{
+    "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQGV4YW1wbGUuY29tIiwic3ViIjoxLCJyb2xlIjoiQWRtaW4iLCJpYXQiOjE3NDY3OTIxNDcsImV4cCI6MTc0Njc5NTc0N30.ecVIbMLPoEODYhmceyUBr4gSCbTsQrLu_I4EVPR58oE"
+}
