@@ -18,7 +18,10 @@ import { InvoiceModule } from './invoice/invoice.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({isGlobal:true}),
+    ConfigModule.forRoot({
+      isGlobal:true,
+      envFilePath: process.env.NODE_ENV === 'production' ? undefined : '.env',
+    }),
     TypeOrmModule.forRootAsync({
       imports: [DatabaseModule],
       useClass: TypeOrmConfigService,
