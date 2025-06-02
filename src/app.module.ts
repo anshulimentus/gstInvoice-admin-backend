@@ -16,42 +16,16 @@ import { GstMasterModule } from './gstmaster/gstmaster.module';
 import { ImageModule } from './image/image.module';
 import { InvoiceModule } from './invoice/invoice.module';
 
-// @Module({
-//   imports: [
-//     ConfigModule.forRoot({
-//       isGlobal:true,
-//       envFilePath: process.env.NODE_ENV === 'production' ? undefined : '.env',
-//     }),
-//     TypeOrmModule.forRootAsync({
-//       imports: [DatabaseModule],
-//       useClass: TypeOrmConfigService,
-     
-//     }),
-//     AuthModule,
-//     UsersModule,
-//     StateModule,
-//     CategoryModule,
-//     CompanyModule,
-//     UploadModule,
-//     DatabaseModule,
-//     GstMasterModule,
-//     ImageModule,
-//     InvoiceModule
-//   ],
-//   controllers: [AppController],
-//   providers: [AppService],
-//   exports: [TypeOrmModule], // Export TypeOrmModule for use in other modules
-// })
-// export class AppModule {}
-
 @Module({
   imports: [
     ConfigModule.forRoot({
-      isGlobal: true,
+      isGlobal:true,
       envFilePath: process.env.NODE_ENV === 'production' ? undefined : '.env',
     }),
     TypeOrmModule.forRootAsync({
+      imports: [DatabaseModule],
       useClass: TypeOrmConfigService,
+     
     }),
     AuthModule,
     UsersModule,
@@ -59,11 +33,13 @@ import { InvoiceModule } from './invoice/invoice.module';
     CategoryModule,
     CompanyModule,
     UploadModule,
+    DatabaseModule,
     GstMasterModule,
     ImageModule,
     InvoiceModule
   ],
   controllers: [AppController],
   providers: [AppService],
+  exports: [TypeOrmModule], // Export TypeOrmModule for use in other modules
 })
 export class AppModule {}
