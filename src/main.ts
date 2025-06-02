@@ -7,6 +7,7 @@ import { join } from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import chalk from 'chalk';
 import * as bodyParser from 'body-parser';
+import { DataSource } from 'typeorm';
 
 async function bootstrap() {
   // ✅ Explicitly specify that we're using Express
@@ -37,6 +38,7 @@ async function bootstrap() {
     credentials: true,
     
   });
+  
 
   await app.listen(3000);
   console.log("✅ NestJS server running on http://localhost:3000");
