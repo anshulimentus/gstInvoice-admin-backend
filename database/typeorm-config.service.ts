@@ -15,7 +15,7 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
       type: 'postgres',
       url: process.env.DATABASE_URL, // ✅ Use DATABASE_URL directly
       entities: [Company, User, State, Category, GstMaster, ImageEntity, Invoice],
-      synchronize: false,
+      synchronize: true,
       logging: true,
       migrations: ['dist/migrations/*.js'],
     };
