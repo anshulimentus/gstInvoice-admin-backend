@@ -15,7 +15,9 @@ export const AppDataSource = new DataSource({
   type: 'postgres',
   url: process.env.DATABASE_HOST_SUPABASE, // from .env file
   entities: [Company, User, State, Category, GstMaster, ImageEntity, Invoice],
-  migrations: ['src/migrations/*.ts'],
+//   migrations: ['src/migrations/*.ts'],
+migrations: ['dist/migrations/*.js'],
+
   synchronize: false,
   migrationsRun: true,
   logging: true,
