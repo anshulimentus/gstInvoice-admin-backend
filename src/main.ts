@@ -14,6 +14,14 @@ async function bootstrap() {
   // ✅ Explicitly specify that we're using Express
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
+    
+  const dataSource = app.get(DataSource);
+  try {
+    await dataSource.initialize();
+    console.log('✅ Connected to the database');
+  } catch (err) {
+    console.error('❌ Failed to connect to the database', err);
+  }
   // // Ensure the database is created before starting the application
   // const databaseInitService = app.get(DatabaseInitService);
   // await databaseInitService.initializeDatabase();
