@@ -8,15 +8,15 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import chalk from 'chalk';
 import * as bodyParser from 'body-parser';
 import { DataSource } from 'typeorm';
-import { DatabaseInitService } from './database/database-init.service';
+// import { DatabaseInitService } from './database/database-init.service';
 
 async function bootstrap() {
   // ✅ Explicitly specify that we're using Express
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
-  // Ensure the database is created before starting the application
-  const databaseInitService = app.get(DatabaseInitService);
-  await databaseInitService.initializeDatabase();
+  // // Ensure the database is created before starting the application
+  // const databaseInitService = app.get(DatabaseInitService);
+  // await databaseInitService.initializeDatabase();
 
   app.use((req: Request, res: Response, next: NextFunction) => {
     console.log(chalk.bgMagenta.white(`✅✅🧪✅✅ [${new Date().toISOString()}] ${req.method} ${req.url}`));
