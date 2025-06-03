@@ -2,7 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { User } from '../../users/users.entity';
 
 
-@Entity('Company') // Explicitly define table name
+@Entity('company') // Explicitly define table name
 export class Company {
   @PrimaryGeneratedColumn()
   id: number;
