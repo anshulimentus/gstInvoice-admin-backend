@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express'; // Add this at the to
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
-import  * as express from "express";
+import * as express from "express";
 import { join } from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import chalk from 'chalk';
@@ -11,20 +11,10 @@ import { DataSource } from 'typeorm';
 // import { DatabaseInitService } from './database/database-init.service';
 
 async function bootstrap() {
+
   // ✅ Explicitly specify that we're using Express
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
-    
-  const dataSource = app.get(DataSource);
-  try {
-    await dataSource.initialize();
-    console.log('✅ Connected to the database');
-  } catch (err) {
-    console.error('❌ Failed to connect to the database', err);
-  }
-  // // Ensure the database is created before starting the application
-  // const databaseInitService = app.get(DatabaseInitService);
-  // await databaseInitService.initializeDatabase();
 
   app.use((req: Request, res: Response, next: NextFunction) => {
     console.log(chalk.bgMagenta.white(`✅✅🧪✅✅ [${new Date().toISOString()}] ${req.method} ${req.url}`));
@@ -49,10 +39,11 @@ async function bootstrap() {
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     allowedHeaders: "Content-Type,Authorization",
     credentials: true,
-    
+
   });
 
   await app.listen(3000);
   console.log("✅ NestJS server running on http://localhost:3000");
 }
+
 bootstrap();
