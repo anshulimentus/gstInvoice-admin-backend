@@ -16,7 +16,7 @@ export const AppDataSource = new DataSource({
   url: process.env.DATABASE_HOST_SUPABASE, // from .env file
   entities: [Company, User, State, Category, GstMaster, ImageEntity, Invoice],
 //   migrations: ['src/migrations/*.ts'],
-migrations: ['dist/migrations/*.js'],
+    migrations: ['dist/migrations/*.js'],
 
   synchronize: false,
   migrationsRun: true,
