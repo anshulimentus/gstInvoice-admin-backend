@@ -64,6 +64,39 @@ import { GstMasterModule } from './gstmaster/gstmaster.module';
 import { ImageModule } from './image/image.module';
 import { InvoiceModule } from './invoice/invoice.module';
 
+// @Module({
+//   imports: [
+//     ConfigModule.forRoot({
+//       isGlobal: true,
+//       envFilePath: process.env.NODE_ENV === 'production' ? undefined : '.env',
+//     }),
+//     TypeOrmModule.forRootAsync({
+//       imports: [DatabaseModule],
+//       useClass: TypeOrmConfigService,
+//     }),
+//     AuthModule,
+//     UsersModule,
+//     StateModule,
+//     CategoryModule,
+//     CompanyModule,
+//     DatabaseModule,
+//     GstMasterModule,
+//     ImageModule,
+//     InvoiceModule,
+//   ],
+//   controllers: [AppController],
+//   providers: [AppService, DatabaseInitService],
+//   exports: [TypeOrmModule], // Export TypeOrmModule for use in other modules
+// })
+// export class AppModule implements OnApplicationBootstrap {
+//   constructor(private readonly databaseInitService: DatabaseInitService) {}
+
+//   async onApplicationBootstrap() {
+//     await this.databaseInitService.initializeDatabase();
+//   }
+// }
+
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -71,27 +104,19 @@ import { InvoiceModule } from './invoice/invoice.module';
       envFilePath: process.env.NODE_ENV === 'production' ? undefined : '.env',
     }),
     TypeOrmModule.forRootAsync({
-      imports: [DatabaseModule],
-      useClass: TypeOrmConfigService,
+      imports: [ConfigModule],
+      useClass: TypeOrmConfigService, // should return config with `synchronize: true`
     }),
     AuthModule,
     UsersModule,
     StateModule,
     CategoryModule,
     CompanyModule,
-    DatabaseModule,
     GstMasterModule,
     ImageModule,
     InvoiceModule,
   ],
   controllers: [AppController],
-  providers: [AppService, DatabaseInitService],
-  exports: [TypeOrmModule], // Export TypeOrmModule for use in other modules
+  providers: [AppService],
 })
-export class AppModule implements OnApplicationBootstrap {
-  constructor(private readonly databaseInitService: DatabaseInitService) {}
-
-  async onApplicationBootstrap() {
-    await this.databaseInitService.initializeDatabase();
-  }
-}
+export class AppModule {}
