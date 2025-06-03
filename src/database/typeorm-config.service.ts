@@ -19,9 +19,9 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
     //   password: process.env.DATABASE_PASSWORD || 'password',
     //   database: process.env.DATABASE_NAME || 'default_database',
       url: process.env.DATABASE_URL,
-      ssl: {
-        rejectUnauthorized: false, // This allows connecting to Render-hosted Postgres over SSL
-      },
+    //   ssl: {
+    //     rejectUnauthorized: false, // This allows connecting to Render-hosted Postgres over SSL
+    //   },
       entities: [Company, User, State, Category, GstMaster, ImageEntity, Invoice],
       synchronize: false, // Disable auto-sync; handled by DatabaseInitService
       logging: true,
