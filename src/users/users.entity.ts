@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, BeforeInsert, BeforeUpdate } from 'typeorm';
 
 @Entity('users')
 export class User {
@@ -11,10 +11,18 @@ export class User {
   @Column()
   password: string;
 
-  @Column()
-  name: string;
+  @Column({ unique: true, nullable: true })
+  wallet_address: string | null;
 
-  @Column({ default: 'User' })
+  @BeforeInsert()
+  @BeforeUpdate()
+  normalizeWalletAddress() {
+    if (this.wallet_address) {
+      this.wallet_address = this.wallet_address.toLowerCase();
+    }
+  }
+
+  @Column({ default: 'user' })
   role: string;
 
   @CreateDateColumn()

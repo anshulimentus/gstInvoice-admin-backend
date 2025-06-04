@@ -6,33 +6,46 @@ import { ethers } from 'ethers';
 @Injectable()
 export class AuthService {
   private readonly nonces = new Map<string, string>();
-  private readonly logger = new Logger(AuthService.name); // NestJS Logger
+  private readonly logger = new Logger(AuthService.name);
 
   constructor(
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
   ) {}
 
-  async validateUser(email: string, pass: string): Promise<any> {
+  async validateUser(email: string, password: string): Promise<any> {
     this.logger.log(`Validating user with email: ${email}`);
     const user = await this.usersService.findOneByEmail(email);
-    if (user && pass === user.password) {
+    
+    if (user && await this.usersService.validatePassword(password, user.password)) {
       this.logger.log(`User validated successfully: ${email}`);
-      const { password, ...result } = user;
+      const { password: _, ...result } = user;
       return result;
     }
+    
     this.logger.warn(`User validation failed for email: ${email}`);
     return null;
   }
 
   async login(user: any) {
     this.logger.log(`Logging in user: ${user.email}`);
-    const payload = { email: user.email, sub: user.id, role: user.role };
+    const payload = { 
+      email: user.email, 
+      sub: user.id, 
+      role: user.role,
+      walletAddress: user.wallet_address 
+    };
     const token = this.jwtService.sign(payload);
     this.logger.log(`Token generated for user: ${user.email}`);
     return {
       token,
       role: user.role,
+      user: {
+        id: user.id,
+        email: user.email,
+        wallet_address: user.wallet_address,
+        role: user.role
+      }
     };
   }
 
@@ -49,21 +62,27 @@ export class AuthService {
     return { nonce };
   }
 
-  async walletLogin(walletAddress: string, signature: string): Promise<any> {
+  async walletLogin(walletAddress: string, signature: string, nonce?: string): Promise<any> {
     const lowercaseAddress = walletAddress.toLowerCase();
     this.logger.log(`Wallet login attempt for address: ${walletAddress}`);
 
-    const nonce = this.nonces.get(lowercaseAddress);
-    if (!nonce) {
+    // Get nonce from parameter or stored nonces
+    let storedNonce = nonce;
+    if (!storedNonce) {
+      storedNonce = this.nonces.get(lowercaseAddress);
+    }
+
+    if (!storedNonce) {
       this.logger.warn(`Nonce not found for wallet: ${walletAddress}`);
       throw new UnauthorizedException('Nonce not found. Please request a new one.');
     }
-    this.logger.log(`Nonce found for wallet: ${walletAddress}, nonce: ${nonce}`);
+    this.logger.log(`Nonce found for wallet: ${walletAddress}, nonce: ${storedNonce}`);
 
+    // Verify signature
     let recoveredAddress: string;
     try {
-        recoveredAddress = ethers.utils.verifyMessage(`Sign this message to verify your identity: ${nonce}`, signature);
-
+      const message = `Sign this message to verify your identity: ${storedNonce}`;
+      recoveredAddress = ethers.utils.verifyMessage(message, signature);
       this.logger.log(`Recovered address from signature: ${recoveredAddress}`);
     } catch (err) {
       this.logger.error(`Invalid signature for wallet: ${walletAddress}`, err.stack);
@@ -75,21 +94,36 @@ export class AuthService {
       throw new UnauthorizedException('Signature verification failed');
     }
 
+    // Check if user exists with this wallet address
+    const user = await this.usersService.findOneByWalletAddress(lowercaseAddress);
+    if (!user) {
+      this.logger.warn(`No user found with wallet address: ${walletAddress}`);
+      throw new UnauthorizedException('No user found with this wallet address. Please register first.');
+    }
+
     // Clean up used nonce
     this.nonces.delete(lowercaseAddress);
     this.logger.log(`Nonce cleaned up for wallet: ${walletAddress}`);
 
-    // TODO: You can look up the user from DB by walletAddress if needed
-    const role = 'admin'; // or pull dynamically
-    const token = this.jwtService.sign(
-      { walletAddress: lowercaseAddress, role: 'admin' },
-      { secret: 'secretKey', expiresIn: '5h' },
-    );
-    this.logger.log(`Token generated for wallet: ${walletAddress}, role: ${role}`);
+    // Generate JWT token
+    const payload = { 
+      email: user.email, 
+      sub: user.id, 
+      role: user.role,
+      walletAddress: user.wallet_address 
+    };
+    const token = this.jwtService.sign(payload);
+    this.logger.log(`Token generated for wallet: ${walletAddress}, role: ${user.role}`);
 
     return {
       token,
-      role: 'admin',
+      role: user.role,
+      user: {
+        id: user.id,
+        email: user.email,
+        wallet_address: user.wallet_address,
+        role: user.role
+      }
     };
   }
 }

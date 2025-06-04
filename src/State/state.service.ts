@@ -2,13 +2,14 @@ import { Injectable, NotFoundException, InternalServerErrorException } from "@ne
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { State } from "./entities/state.entity";
+import { CreateStateDto } from "./dto/create-state.dto";
 
 @Injectable()
 export class StateService {
     constructor(
         @InjectRepository(State)
         private readonly stateRepository: Repository<State>,
-    ) {}
+    ) { }
 
     async getStates(): Promise<State[]> {
         return await this.stateRepository.find();
@@ -22,9 +23,9 @@ export class StateService {
         return state;
     }
 
-    async createState(name: string): Promise<State> {
-        const state = this.stateRepository.create({ name });
-        return await this.stateRepository.save(state);
+    async createState(dto: CreateStateDto): Promise<State> {
+        const category = this.stateRepository.create(dto);
+        return await this.stateRepository.save(category);
     }
 
     async updateState(id: number, name: string): Promise<State> {

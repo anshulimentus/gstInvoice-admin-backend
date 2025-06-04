@@ -18,8 +18,8 @@ export class CreateCompanyDto {
   email: string;
 
   @IsNotEmpty()
-    @IsString()
-    image_url: string;
+  @IsString()
+  image_url: string;
 
   @IsNotEmpty()
   @IsString()

@@ -25,16 +25,16 @@ import {
     }
   
     @Get('demo')
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(Role.Admin)
+    // @UseGuards(JwtAuthGuard, RolesGuard)
+    // @Roles(Role.Admin)
     async demo() {
       console.log(chalk.bgBlue("🚀 Demo router hit...."));
       return { message: "Demo route is working" };
     }
   
     @Get('count')
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(Role.Admin)
+    // @UseGuards(JwtAuthGuard, RolesGuard)
+    // @Roles(Role.Admin)
     async getTotalCompanies() {
       console.log(chalk.bgBlueBright("🚀 Total company router hit...."));
       const count = await this.companyService.getTotalCompanies();

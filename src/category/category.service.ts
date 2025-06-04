@@ -9,15 +9,15 @@ export class CategoryService {
     constructor(
         @InjectRepository(Category)
         private readonly categoryRepository: Repository<Category>,
-    ) {}
+    ) { }
 
     async getCategories(): Promise<Category[]> {
         return await this.categoryRepository.find();
     }
 
     async getCategory(id: number): Promise<Category> {
-        const category = await this.categoryRepository.findOne({where: {id}});
-        if(!category) {
+        const category = await this.categoryRepository.findOne({ where: { id } });
+        if (!category) {
             throw new NotFoundException(`State with id ${id} not found`);
         }
         return category;
@@ -26,6 +26,6 @@ export class CategoryService {
     async createCategory(dto: CreateCategoryDto): Promise<Category> {
         const category = this.categoryRepository.create(dto);
         return await this.categoryRepository.save(category);
-      }
+    }
 }
 
