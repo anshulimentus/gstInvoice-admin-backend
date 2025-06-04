@@ -10,7 +10,7 @@ export class DatabaseInitService {
 
   async initializeDatabase() {
     try {
-      await this.checkAndCreateDatabase();
+      // await this.checkAndCreateDatabase();
       await this.checkAndCreateTables();
     } catch (error) {
       this.logger.error('Error during database initialization:', error);
