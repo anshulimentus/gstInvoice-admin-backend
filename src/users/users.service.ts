@@ -19,30 +19,29 @@ export class UsersService {
 
   async create(createUserDto: CreateUserDto): Promise<SafeUser> {
     const { email, password, wallet_address, role = 'user' } = createUserDto;
-
+  
     const existingUser = await this.findOneByEmail(email);
     if (existingUser) {
       throw new ConflictException('User with this email already exists');
     }
-
-    if (wallet_address) {
-      const existingWallet = await this.findOneByWalletAddress(wallet_address);
-      if (existingWallet) {
-        throw new ConflictException('User with this wallet address already exists');
-      }
+  
+    const existingWallet = await this.findOneByWalletAddress(wallet_address ?? '');
+    if (existingWallet) {
+      throw new ConflictException('User with this wallet address already exists');
     }
-
+  
     const newUser = this.userRepository.create({
       email: email.toLowerCase(),
       password,
-      wallet_address: wallet_address?.toLowerCase() ?? null,
+      wallet_address: wallet_address?.toLowerCase() ?? '',
       role: role.toLowerCase(),
     });
-
+  
     const savedUser = await this.userRepository.save(newUser);
     const { password: _, normalizeWalletAddress, ...userWithoutPassword } = savedUser;
     return userWithoutPassword;
   }
+  
 
   async findOneByEmail(email: string): Promise<User | null> {
     return await this.userRepository.findOne({

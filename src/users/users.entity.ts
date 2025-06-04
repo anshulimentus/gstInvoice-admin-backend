@@ -11,8 +11,8 @@ export class User {
   @Column()
   password: string;
 
-  @Column({ type: 'varchar', unique: true, nullable: true })
-  wallet_address: string | null;
+  @Column({ type: 'varchar', unique: true, nullable: false })
+  wallet_address: string;
   
   @BeforeInsert()
   @BeforeUpdate()
