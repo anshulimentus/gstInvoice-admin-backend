@@ -11,9 +11,9 @@ export class User {
   @Column()
   password: string;
 
-  @Column({ unique: true, nullable: true })
+  @Column({ type: 'varchar', unique: true, nullable: true })
   wallet_address: string | null;
-
+  
   @BeforeInsert()
   @BeforeUpdate()
   normalizeWalletAddress() {
@@ -22,7 +22,7 @@ export class User {
     }
   }
 
-  @Column({ default: 'user' })
+  @Column({ default: 'admin' })
   role: string;
 
   @CreateDateColumn()
