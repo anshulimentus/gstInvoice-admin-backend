@@ -35,7 +35,7 @@ async function bootstrap() {
 
   // ✅ Fix CORS
   app.enableCors({
-    origin: ["https://gst-invoice-admin-frontend.vercel.app"], // Allow frontend
+    origin: ['http://localhost:5173','https://gst-invoice-admin-frontend.vercel.app'], // Allow frontend
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     allowedHeaders: "Content-Type,Authorization",
     credentials: true,
