@@ -8,7 +8,7 @@ import {
   import { JwtAuthGuard } from '../auth/jwt-auth.guard';
   import { Roles } from '../auth/roles.decorator';
   import { RolesGuard } from '../auth/roles.guard';
-  import { Role } from '../common/enums/role.enum';
+  import { Role } from '../users/roles.enum';
   import chalk from 'chalk';
 
   
@@ -19,9 +19,14 @@ import {
     @Post('add')
     // @UseGuards(JwtAuthGuard, RolesGuard)
     // @Roles(Role.Admin)
-    async create(@Body() createCompanyDto: CreateCompanyDto, @Req() req: Request) {
+    async create(@Body() createCompanyDto: CreateCompanyDto, @Req() req: any) {
       console.log(chalk.green("🚀 Create Company router hit...."));
-      return this.companyService.create(createCompanyDto, createCompanyDto.image_url);
+
+      // Get user wallet address from JWT token if available
+      const userWalletAddress = req.user?.walletAddress;
+      console.log(chalk.blue(`👤 User wallet address: ${userWalletAddress || 'Not authenticated'}`));
+
+      return this.companyService.create(createCompanyDto, createCompanyDto.image_url, userWalletAddress);
     }
   
     @Get('demo')
@@ -64,17 +69,26 @@ import {
     @Patch(':id')
     // @UseGuards(JwtAuthGuard, RolesGuard)
     // @Roles(Role.Admin)
-    async update(@Param('id', ParseIntPipe) id: number, @Body() updateCompanyDto: UpdateCompanyDto) {
+    async update(@Param('id', ParseIntPipe) id: number, @Body() updateCompanyDto: UpdateCompanyDto, @Req() req: any) {
       console.log(chalk.bgBlueBright("🚀 Update company router hit...."));
-      return this.companyService.update(id, updateCompanyDto);
+
+      // Get user wallet address from JWT token if available
+      const userWalletAddress = req.user?.walletAddress;
+      console.log(chalk.blue(`👤 User wallet address: ${userWalletAddress || 'Not authenticated'}`));
+
+      return this.companyService.update(id, updateCompanyDto, userWalletAddress);
     }
-  
+
     @Delete(':id')
-    // @UseGuards(JwtAuthGuard, RolesGuard)
-    // @Roles(Role.Admin)
-    async remove(@Param('id', ParseIntPipe) id: number) {
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.Admin)
+    async remove(@Param('id', ParseIntPipe) id: number, @Req() req: any) {
       console.log(chalk.bgRedBright("🚀 Delete company router hit...."));
-      return this.companyService.remove(id);
+
+      // Get user wallet address from JWT token if available
+      const userWalletAddress = req.user?.walletAddress;
+      console.log(chalk.blue(`👤 User wallet address: ${userWalletAddress || 'Not authenticated'}`));
+
+      return this.companyService.remove(id, userWalletAddress);
     }
   }
-  

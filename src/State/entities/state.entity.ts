@@ -6,7 +6,5 @@ export class State {
     id: number;
 
     @Column({ unique: true })
-    name: string;
-
-   
+    name: string;   
 }

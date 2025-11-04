@@ -6,6 +6,8 @@ import { CreateCompanyDto } from "./dto/create-company.dto";
 import { UpdateCompanyDto } from "./dto/update-company.dto";
 import Web3 from "web3";
 import chalk from "chalk";
+import { CONTRACT_ABI } from "../abi/contract.abi";
+import { UsersService } from "../users/users.service";
 
 
 @Injectable()
@@ -17,20 +19,17 @@ export class CompanyService {
     private privateKey: string;
     private providerURL: string;
     private ownerAddress: string;
-    // private contractAddress = process.env.CONTRACT_ADDRESS;
-    // private privateKey = process.env.PRIVATE_KEY;
-    // private providerURL = process.env.PROVIDER_URL;
-    // private ownerAddress = process.env.OWNER_ADDRESS;
 
     constructor(
         @InjectRepository(Company)
         private readonly companyRepository: Repository<Company>,
+        private readonly usersService: UsersService,
     ) {
             // Validate environment variables
     if (!process.env.PROVIDER_URL) {
         throw new Error('PROVIDER_URL is not set in environment variables');
       }
-      if (!process.env.CONTRACT_ADDRESS_COMPANY) {
+      if (!process.env.CONTRACT_ADDRESS) {
         throw new Error('CONTRACT_ADDRESS is not set in environment variables');
       }
       if (!process.env.PRIVATE_KEY) {
@@ -41,568 +40,12 @@ export class CompanyService {
       }
   
       this.providerURL = process.env.PROVIDER_URL;
-      this.contractAddress = process.env.CONTRACT_ADDRESS_COMPANY;
+      this.contractAddress = process.env.CONTRACT_ADDRESS;
       this.privateKey = process.env.PRIVATE_KEY;
       this.ownerAddress = process.env.OWNER_ADDRESS;
 
         this.web3 = new Web3(new Web3.providers.HttpProvider(this.providerURL));
-        this.contract = new this.web3.eth.Contract([
-            {
-                "inputs": [],
-                "stateMutability": "nonpayable",
-                "type": "constructor"
-            },
-            {
-                "anonymous": false,
-                "inputs": [
-                    {
-                        "indexed": false,
-                        "internalType": "uint256",
-                        "name": "id",
-                        "type": "uint256"
-                    },
-                    {
-                        "indexed": false,
-                        "internalType": "string",
-                        "name": "name",
-                        "type": "string"
-                    },
-                    {
-                        "indexed": false,
-                        "internalType": "string",
-                        "name": "gstNumber",
-                        "type": "string"
-                    },
-                    {
-                        "indexed": false,
-                        "internalType": "address",
-                        "name": "wallet",
-                        "type": "address"
-                    },
-                    {
-                        "indexed": false,
-                        "internalType": "address",
-                        "name": "legalRepresentative",
-                        "type": "address"
-                    }
-                ],
-                "name": "CompanyAdded",
-                "type": "event"
-            },
-            {
-                "anonymous": false,
-                "inputs": [
-                    {
-                        "indexed": false,
-                        "internalType": "uint256",
-                        "name": "id",
-                        "type": "uint256"
-                    },
-                    {
-                        "indexed": false,
-                        "internalType": "address",
-                        "name": "wallet",
-                        "type": "address"
-                    }
-                ],
-                "name": "CompanyDeleted",
-                "type": "event"
-            },
-            {
-                "anonymous": false,
-                "inputs": [
-                    {
-                        "indexed": false,
-                        "internalType": "uint256",
-                        "name": "id",
-                        "type": "uint256"
-                    },
-                    {
-                        "indexed": false,
-                        "internalType": "string",
-                        "name": "name",
-                        "type": "string"
-                    },
-                    {
-                        "indexed": false,
-                        "internalType": "string",
-                        "name": "gstNumber",
-                        "type": "string"
-                    },
-                    {
-                        "indexed": false,
-                        "internalType": "address",
-                        "name": "wallet",
-                        "type": "address"
-                    },
-                    {
-                        "indexed": false,
-                        "internalType": "address",
-                        "name": "legalRepresentative",
-                        "type": "address"
-                    }
-                ],
-                "name": "CompanyUpdated",
-                "type": "event"
-            },
-            {
-                "anonymous": false,
-                "inputs": [
-                    {
-                        "indexed": true,
-                        "internalType": "address",
-                        "name": "oldOwner",
-                        "type": "address"
-                    },
-                    {
-                        "indexed": true,
-                        "internalType": "address",
-                        "name": "newOwner",
-                        "type": "address"
-                    }
-                ],
-                "name": "OwnershipTransferred",
-                "type": "event"
-            },
-            {
-                "anonymous": false,
-                "inputs": [
-                    {
-                        "indexed": false,
-                        "internalType": "uint256",
-                        "name": "userId",
-                        "type": "uint256"
-                    },
-                    {
-                        "indexed": false,
-                        "internalType": "string",
-                        "name": "username",
-                        "type": "string"
-                    },
-                    {
-                        "indexed": true,
-                        "internalType": "address",
-                        "name": "companyWallet",
-                        "type": "address"
-                    }
-                ],
-                "name": "UserTransactionAdded",
-                "type": "event"
-            },
-            {
-                "anonymous": false,
-                "inputs": [
-                    {
-                        "indexed": false,
-                        "internalType": "uint256",
-                        "name": "userId",
-                        "type": "uint256"
-                    },
-                    {
-                        "indexed": true,
-                        "internalType": "address",
-                        "name": "companyWallet",
-                        "type": "address"
-                    }
-                ],
-                "name": "UserTransactionDeleted",
-                "type": "event"
-            },
-            {
-                "anonymous": false,
-                "inputs": [
-                    {
-                        "indexed": false,
-                        "internalType": "uint256",
-                        "name": "userId",
-                        "type": "uint256"
-                    },
-                    {
-                        "indexed": false,
-                        "internalType": "string",
-                        "name": "username",
-                        "type": "string"
-                    },
-                    {
-                        "indexed": true,
-                        "internalType": "address",
-                        "name": "companyWallet",
-                        "type": "address"
-                    }
-                ],
-                "name": "UserTransactionUpdated",
-                "type": "event"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "address",
-                        "name": "",
-                        "type": "address"
-                    }
-                ],
-                "name": "actionHistory",
-                "outputs": [
-                    {
-                        "internalType": "string",
-                        "name": "method",
-                        "type": "string"
-                    },
-                    {
-                        "internalType": "bytes32",
-                        "name": "transactionHash",
-                        "type": "bytes32"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "date",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "id",
-                        "type": "uint256"
-                    }
-                ],
-                "stateMutability": "view",
-                "type": "function"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "string",
-                        "name": "_name",
-                        "type": "string"
-                    },
-                    {
-                        "internalType": "string",
-                        "name": "_gstNumber",
-                        "type": "string"
-                    },
-                    {
-                        "internalType": "address",
-                        "name": "_legalRep",
-                        "type": "address"
-                    }
-                ],
-                "name": "addCompany",
-                "outputs": [],
-                "stateMutability": "nonpayable",
-                "type": "function"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "address",
-                        "name": "_companyWallet",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "string",
-                        "name": "_username",
-                        "type": "string"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "_amount",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "_gst",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "address",
-                        "name": "_userAddress",
-                        "type": "address"
-                    }
-                ],
-                "name": "addUserTransaction",
-                "outputs": [],
-                "stateMutability": "nonpayable",
-                "type": "function"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "address",
-                        "name": "",
-                        "type": "address"
-                    }
-                ],
-                "name": "companies",
-                "outputs": [
-                    {
-                        "internalType": "uint256",
-                        "name": "id",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "string",
-                        "name": "name",
-                        "type": "string"
-                    },
-                    {
-                        "internalType": "string",
-                        "name": "gstNumber",
-                        "type": "string"
-                    },
-                    {
-                        "internalType": "address",
-                        "name": "wallet",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "address",
-                        "name": "legalRepresentative",
-                        "type": "address"
-                    }
-                ],
-                "stateMutability": "view",
-                "type": "function"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "uint256",
-                        "name": "",
-                        "type": "uint256"
-                    }
-                ],
-                "name": "companyIdToWallet",
-                "outputs": [
-                    {
-                        "internalType": "address",
-                        "name": "",
-                        "type": "address"
-                    }
-                ],
-                "stateMutability": "view",
-                "type": "function"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "uint256",
-                        "name": "_companyId",
-                        "type": "uint256"
-                    }
-                ],
-                "name": "deleteCompany",
-                "outputs": [],
-                "stateMutability": "nonpayable",
-                "type": "function"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "address",
-                        "name": "_companyWallet",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "_userId",
-                        "type": "uint256"
-                    }
-                ],
-                "name": "deleteUserTransaction",
-                "outputs": [],
-                "stateMutability": "nonpayable",
-                "type": "function"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "address",
-                        "name": "_companyWallet",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "_userId",
-                        "type": "uint256"
-                    }
-                ],
-                "name": "getUserTransaction",
-                "outputs": [
-                    {
-                        "components": [
-                            {
-                                "internalType": "uint256",
-                                "name": "userId",
-                                "type": "uint256"
-                            },
-                            {
-                                "internalType": "string",
-                                "name": "username",
-                                "type": "string"
-                            },
-                            {
-                                "internalType": "uint256",
-                                "name": "amount",
-                                "type": "uint256"
-                            },
-                            {
-                                "internalType": "uint256",
-                                "name": "gst",
-                                "type": "uint256"
-                            },
-                            {
-                                "internalType": "address",
-                                "name": "userAddress",
-                                "type": "address"
-                            }
-                        ],
-                        "internalType": "struct AdminInvoice.UserTransaction",
-                        "name": "",
-                        "type": "tuple"
-                    }
-                ],
-                "stateMutability": "view",
-                "type": "function"
-            },
-            {
-                "inputs": [],
-                "name": "owner",
-                "outputs": [
-                    {
-                        "internalType": "address",
-                        "name": "",
-                        "type": "address"
-                    }
-                ],
-                "stateMutability": "view",
-                "type": "function"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "address",
-                        "name": "_newOwner",
-                        "type": "address"
-                    }
-                ],
-                "name": "transferOwnership",
-                "outputs": [],
-                "stateMutability": "nonpayable",
-                "type": "function"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "uint256",
-                        "name": "_companyId",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "address",
-                        "name": "_newLegalRep",
-                        "type": "address"
-                    }
-                ],
-                "name": "updateCompany",
-                "outputs": [],
-                "stateMutability": "nonpayable",
-                "type": "function"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "address",
-                        "name": "_companyWallet",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "address",
-                        "name": "_newLegalRep",
-                        "type": "address"
-                    }
-                ],
-                "name": "updateLegalRepresentative",
-                "outputs": [],
-                "stateMutability": "nonpayable",
-                "type": "function"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "address",
-                        "name": "_companyWallet",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "_userId",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "string",
-                        "name": "_username",
-                        "type": "string"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "_amount",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "_gst",
-                        "type": "uint256"
-                    }
-                ],
-                "name": "updateUserTransaction",
-                "outputs": [],
-                "stateMutability": "nonpayable",
-                "type": "function"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "address",
-                        "name": "",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "",
-                        "type": "uint256"
-                    }
-                ],
-                "name": "userTransactions",
-                "outputs": [
-                    {
-                        "internalType": "uint256",
-                        "name": "userId",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "string",
-                        "name": "username",
-                        "type": "string"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "amount",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "gst",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "address",
-                        "name": "userAddress",
-                        "type": "address"
-                    }
-                ],
-                "stateMutability": "view",
-                "type": "function"
-            }
-        ], this.contractAddress);
+        this.contract = new this.web3.eth.Contract(CONTRACT_ABI, this.contractAddress);
 
         const sanitizedPrivateKey = this.privateKey.startsWith("0x")
             ? this.privateKey
@@ -621,8 +64,10 @@ export class CompanyService {
     }
 
 
-    private async sendTransaction(encodedABI: string): Promise<any> {
-        const nonce = await this.web3.eth.getTransactionCount(this.ownerAddress, "latest");
+    private async sendTransaction(encodedABI: string, userWalletAddress?: string): Promise<any> {
+        // Use user's wallet address if provided, otherwise use default owner address
+        const signerAddress = userWalletAddress || this.ownerAddress;
+        const nonce = await this.web3.eth.getTransactionCount(signerAddress, "latest");
 
         const tx = {
             to: this.contractAddress,
@@ -633,7 +78,8 @@ export class CompanyService {
             // type: 0, // Optional: only if you specifically want to use legacy type
         };
 
-    
+        console.log(chalk.blue(`🔑 Signing transaction with wallet: ${signerAddress}`));
+
         // Sign transaction using private key
         const signedTx = await this.web3.eth.accounts.signTransaction(tx, this.privateKey);
         console.log("Signed Transaction:", signedTx);
@@ -648,7 +94,7 @@ export class CompanyService {
         return this.web3.eth.sendSignedTransaction(signedTx.rawTransaction);
     }
 
-    async create(createCompanyDto: CreateCompanyDto, logoUrl: string): Promise<Company> {
+    async create(createCompanyDto: CreateCompanyDto, logoUrl: string, userWalletAddress?: string): Promise<Company> {
         const { companyName, gstNumber, legalRepresentative, addressline1, addressline2, district } = createCompanyDto;
 
         if (!companyName || !gstNumber || !legalRepresentative) {
@@ -681,9 +127,19 @@ export class CompanyService {
         console.log("✅ Transaction confirmed!");
         console.log("🔗 Tx Hash:", receipt.transactionHash);
 
+        // Extract image_id from logoUrl (assuming format: /images/{uuid})
+        const imageId = logoUrl.split('/').pop() || '';
+
+        // Construct full backend URL for image loading
+        const baseUrl = process.env.BACKEND_URL || 'http://localhost:3000';
+        const fullImageUrl = logoUrl.startsWith('http')
+            ? logoUrl
+            : `${baseUrl}${logoUrl}`;
+
         const newCompany = this.companyRepository.create({
             ...createCompanyDto,
-            image_url: logoUrl,
+            image_url: fullImageUrl, // Save full backend URL for image loading
+            image_id: imageId,
             address,
             transactionHash: receipt.transactionHash,
         });
@@ -713,15 +169,10 @@ export class CompanyService {
 
 
     // Update a company
-    async update(id: number, updateCompanyDto: UpdateCompanyDto): Promise<Company> {
+    async update(id: number, updateCompanyDto: UpdateCompanyDto, userWalletAddress?: string): Promise<Company> {
         const company = await this.companyRepository.findOne({ where: { id } });
         if (!company) {
             throw new NotFoundException(`Company with ID ${id} not found`);
-        }
-
-        // If legalRepresentative is not provided, use the existing one
-        if (!updateCompanyDto.legalRepresentative) {
-            updateCompanyDto.legalRepresentative = company.legalRepresentative;
         }
 
         // Update the company in the database
@@ -729,12 +180,19 @@ export class CompanyService {
         const updatedCompany = await this.companyRepository.save(company);
 
         // Call the smart contract to update the company
-        const tx = await this.contract.methods
-            .updateCompany(id, updateCompanyDto.legalRepresentative)
-            .send({ from: this.account, gas: 3000000 });
+        const encodedABI = this.contract.methods
+            .updateCompany(company.legalRepresentative, updateCompanyDto.companyName || company.companyName, updateCompanyDto.gstNumber || company.gstNumber)
+            .encodeABI();
+
+        const receipt = await this.sendTransaction(encodedABI);
+
+        if (!receipt || !receipt.status) {
+            console.error("❌ Blockchain transaction failed");
+            throw new InternalServerErrorException("Transaction failed on-chain");
+        }
 
         // Save the transaction hash to the database
-        updatedCompany.transactionHash = tx.transactionHash;
+        updatedCompany.transactionHash = receipt.transactionHash;
         await this.companyRepository.save(updatedCompany);
 
         console.log(chalk.bgGrey("✅ Company updated in database with ID:", updatedCompany.id));
@@ -743,11 +201,31 @@ export class CompanyService {
 
 
     // Delete a company
-    async remove(id: number): Promise<void> {
+    async remove(id: number, userWalletAddress?: string): Promise<void> {
+        const company = await this.companyRepository.findOne({ where: { id } });
+        if (!company) {
+            throw new NotFoundException(`Company with ID ${id} not found`);
+        }
+
+        // Call the smart contract to delete the company
+        const encodedABI = this.contract.methods
+            .deleteCompany(company.legalRepresentative)
+            .encodeABI();
+
+        const receipt = await this.sendTransaction(encodedABI);
+
+        if (!receipt || !receipt.status) {
+            console.error("❌ Blockchain transaction failed");
+            throw new InternalServerErrorException("Transaction failed on-chain");
+        }
+
+        // Delete from database
         const result = await this.companyRepository.delete(id);
         if (result.affected === 0) {
             throw new NotFoundException(`Company with ID ${id} not found`);
         }
+
+        console.log(chalk.bgGrey("✅ Company deleted from database with ID:", id));
     }
 
     // Total companies

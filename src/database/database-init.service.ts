@@ -51,11 +51,11 @@ export class DatabaseInitService {
 
   private async checkAndCreateTables() {
     try {
-      // ❌ REMOVE: await this.dataSource.initialize();
-      await this.dataSource.synchronize(); // Only sync tables
-      this.logger.log('Tables checked/created successfully.');
+      // Run pending migrations instead of synchronize
+      await this.dataSource.runMigrations();
+      this.logger.log('Migrations executed successfully.');
     } catch (error) {
-      this.logger.error('Error creating tables:', error);
+      this.logger.error('Error running migrations:', error);
     }
   }
 }

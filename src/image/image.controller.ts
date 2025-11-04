@@ -25,16 +25,23 @@ export class ImageController {
   @Get(':id')
   async getImage(@Param('id') id: string, @Res() res: Response) {
     const image = await this.imageService.getImageById(id);
-    
+
     if (!image) {
       throw new NotFoundException('Image not found');
     }
-    
+
     // Set content type based on the stored mime type
     res.setHeader('Content-Type', image.mimeType);
-    
+
+    // Handle base64 data - check if it includes data URL prefix
+    let base64Data = image.base64data;
+    if (base64Data.includes(',')) {
+      // Remove data URL prefix (e.g., "data:image/png;base64,")
+      base64Data = base64Data.split(',')[1];
+    }
+
     // Send the base64 data as binary
-    const imageBuffer = Buffer.from(image.base64data.split(',')[1], 'base64');
+    const imageBuffer = Buffer.from(base64Data, 'base64');
     res.send(imageBuffer);
   }
 

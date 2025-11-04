@@ -35,7 +35,7 @@ async function bootstrap() {
 
   // ✅ Fix CORS
   app.enableCors({
-    origin: ['http://localhost:5173','https://gst-invoice-admin-frontend.vercel.app'], // Allow frontend
+    origin: ['http://localhost:5173','https://gst-invoice-admin-frontend.vercel.app', 'http://localhost:5174'], // Allow frontend
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     allowedHeaders: "Content-Type,Authorization",
     credentials: true,
@@ -43,7 +43,7 @@ async function bootstrap() {
   });
 
   await app.listen(3000);
-  console.log("✅ NestJS server running on https://gst-invoice-admin-frontend.vercel.app/");
+  console.log(`✅ NestJS server running on ${process.env.FRONTEND_URL}`);
 }
 
 bootstrap();
