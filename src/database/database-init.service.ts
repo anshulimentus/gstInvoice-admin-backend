@@ -10,6 +10,20 @@ export class DatabaseInitService {
 
   async initializeDatabase() {
     try {
+      // Log which database is being used
+      const databaseType = process.env.DATABASE_TYPE || 'local';
+      const nodeEnv = process.env.NODE_ENV || 'development';
+
+      if (databaseType === 'supabase') {
+        const supabaseUrl = process.env.SUPABASE_URL;
+        this.logger.log(`🔗 Connected to Supabase database (${nodeEnv} environment)`);
+        this.logger.log(`📍 Supabase URL: ${supabaseUrl}`);
+      } else {
+        const databaseUrl = process.env.DATABASE_URL;
+        this.logger.log(`🔗 Connected to Local PostgreSQL database (${nodeEnv} environment)`);
+        this.logger.log(`📍 Database URL: ${databaseUrl?.replace(/:[^:]*@/, ':****@')}`); // Hide password in logs
+      }
+
       // await this.checkAndCreateDatabase();
       await this.checkAndCreateTables();
     } catch (error) {

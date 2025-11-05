@@ -9,20 +9,41 @@ import { GstMaster } from './gstmaster/entities/gstmaster.entity';
 import { ImageEntity } from './image/image.entity';
 import { Invoice } from './invoice/entities/invoice.entity';
 
-const databaseUrl = process.env.DATABASE_URL;
 const nodeEnv = process.env.NODE_ENV || 'development';
-
-if (!databaseUrl) {
-  throw new Error('DATABASE_URL is not defined in environment variables');
-}
+const databaseType = process.env.DATABASE_TYPE || 'local';
 
 // Environment-specific configuration
 const isProduction = nodeEnv === 'production';
 
+let databaseUrl: string;
+let sslConfig: boolean | object;
+
+if (databaseType === 'supabase') {
+  // Use Supabase configuration - use DATABASE_URL directly (supports pooled connections)
+  const dbUrl = process.env.DATABASE_URL;
+
+  if (!dbUrl) {
+    throw new Error('DATABASE_URL must be defined when using Supabase database');
+  }
+
+  databaseUrl = dbUrl;
+  sslConfig = { rejectUnauthorized: false }; // Supabase requires SSL
+} else {
+  // Use local database configuration
+  const localDatabaseUrl = process.env.DATABASE_URL;
+
+  if (!localDatabaseUrl) {
+    throw new Error('DATABASE_URL must be defined when using local database');
+  }
+
+  databaseUrl = localDatabaseUrl;
+  sslConfig = isProduction ? { rejectUnauthorized: false } : false;
+}
+
 export const AppDataSource = new DataSource({
   type: 'postgres',
   url: databaseUrl,
-  ssl: isProduction ? { rejectUnauthorized: false } : false, // SSL for production, disabled for local
+  ssl: sslConfig,
   entities: [Company, User, State, Category, GstMaster, ImageEntity, Invoice],
   migrations: ['dist/migrations/*.js'],
   synchronize: false, // Always use migrations, never synchronize in production

@@ -24,6 +24,7 @@ import { InvoiceModule } from './invoice/invoice.module';
       imports: [ConfigModule],
       useClass: TypeOrmConfigService, // should return config with `synchronize: true`
     }),
+    DatabaseModule, // Add DatabaseModule to imports
     AuthModule,
     UsersModule,
     StateModule,
@@ -37,4 +38,10 @@ import { InvoiceModule } from './invoice/invoice.module';
   providers: [AppService],
 })
 
-export class AppModule { }
+export class AppModule implements OnApplicationBootstrap {
+  constructor(private databaseInitService: DatabaseInitService) {}
+
+  async onApplicationBootstrap() {
+    await this.databaseInitService.initializeDatabase();
+  }
+}
