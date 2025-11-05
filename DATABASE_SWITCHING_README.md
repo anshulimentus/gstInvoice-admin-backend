@@ -55,6 +55,54 @@ To run migrations:
 npm run migration:run
 ```
 
+## Database Seeding
+
+The application includes seeding scripts to populate initial data:
+
+### Categories (Business Types)
+```bash
+# Seed categories locally
+npm run db:seed:categories
+
+# Seed categories for production
+npm run db:seed:categories:prod
+```
+
+**Categories included:**
+- Sole Proprietorship
+- Partnership Firm
+- Limited Liability Partnership (LLP)
+- One Person Company (OPC)
+- Private Limited Company (Pvt. Ltd.)
+- Public Limited Company
+- Section 8 Company (Non-Profit Organization)
+- Cooperative Society
+- Joint Venture
+- Subsidiary of a Foreign Company
+- Producer Company
+- Trust
+- Society
+
+### States (Indian States & Union Territories)
+```bash
+# Seed states locally
+npm run db:seed:states
+
+# Seed states for production
+npm run db:seed:states:prod
+```
+
+**States included:** All 28 Indian states and 8 union territories
+
+### Seed All Data
+```bash
+# Seed both categories and states locally
+npm run db:seed:all
+
+# Seed both categories and states for production
+npm run db:seed:all:prod
+```
+
 ## Notes
 
 - SSL is automatically configured based on the database type
