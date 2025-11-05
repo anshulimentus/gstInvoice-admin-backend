@@ -7,7 +7,6 @@ pnpm-debug.log*
 .pnpm-store/
 .bun-*
 bun.lockb
-package-lock.json
 
 # --- Logs & PIDs
 logs/
