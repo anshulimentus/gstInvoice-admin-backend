@@ -33,7 +33,11 @@
     "db:rollback:local": "npm run migration:revert",
     "db:rollback:prod": "NODE_ENV=production npm run migration:revert",
     "db:seed:categories": "npx ts-node src/database/seed-categories.ts",
-    "db:seed:categories:prod": "NODE_ENV=production npx ts-node src/database/seed-categories.ts"
+    "db:seed:categories:prod": "NODE_ENV=production npx ts-node src/database/seed-categories.ts",
+    "db:seed:states": "npx ts-node src/database/seed-states.ts",
+    "db:seed:states:prod": "NODE_ENV=production npx ts-node src/database/seed-states.ts",
+    "db:seed:all": "npm run db:seed:categories && npm run db:seed:states",
+    "db:seed:all:prod": "npm run db:seed:categories:prod && npm run db:seed:states:prod"
   },
   "dependencies": {
     "@nestjs/cli": "^11.0.7",
