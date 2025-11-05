@@ -1,58 +1,119 @@
-# compiled output
-/dist
-/node_modules
-/build
-
-# Logs
-logs
-*.log
+# --- Runtime + package managers
+node_modules/
 npm-debug.log*
-pnpm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-lerna-debug.log*
+pnpm-debug.log*
+.pnpm-store/
+.bun-*
+bun.lockb
 
-# OS
-.DS_Store
-
-# Tests
-/coverage
-/.nyc_output
-
-# IDEs and editors
-/.idea
-.project
-.classpath
-.c9/
-*.launch
-.settings/
-*.sublime-workspace
-
-# IDE - VSCode
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
-
-# dotenv environment variable files
-.env
-.env.development.local
-.env.test.local
-.env.production.local
-.env.local
-.env.production
-
-# temp directory
-.temp
-.tmp
-
-# Runtime data
-pids
+# --- Logs & PIDs
+logs/
+*.log
+*.log.*
+pids/
 *.pid
 *.seed
 *.pid.lock
 
-# Diagnostic reports (https://nodejs.org/api/report.html)
-report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+# --- Caches & temp
+.cache/
+.cache-loader/
+.esm-cache/
+.tmp/
+.temp/
+tmp/
+temp/
+npm-cache/
+node_modules/.cache/
+
+# --- Build outputs (general)
+dist/
+build/
+out/
+lib/
+coverage/
+.nyc_output/
+
+# --- TypeScript
+*.tsbuildinfo
+tsconfig.tsbuildinfo
+
+# --- Env & secrets
 .env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.crt
+*.cer
+.secret
+secrets/*.json
+
+# --- Databases (local/dev)
+*.sqlite
+*.sqlite3
+*.db
+*.db-journal
+prisma/*.db
+prisma/*-journal
+prisma/migrations/*-shadow.db
+
+# --- Frameworks
+# Next.js
+.next/
+# Nuxt
+.nuxt/
+# SvelteKit
+.svelte-kit/
+# Remix
+.remix/
+# Gatsby
+.cache/
+public/*
+
+# Storybook
+storybook-static/
+
+# Serverless & IaC outputs
+.serverless/
+.cdk.out/
+.vercel/
+.netlify/
+functions/.netlify/
+
+# Testing artifacts
+.jest/
+jest-stare/
+playwright-report/
+test-results/
+cypress/videos/
+cypress/screenshots/
+cypress/downloads/
+cypress/coverage/
+
+# Monorepo / Tooling
+.turbo/
+turbo/
+lerna-debug.log*
+.nx/cache/
+.nx/workspace-data/
+
+# Editors & OS junk
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+*.code-workspace
+
+# Patches / bundles
+*.tgz
+*.orig
+*.rej
+
+# PM2
+.pm2/
